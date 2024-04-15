@@ -27,10 +27,10 @@ int main() {
 
     char str[80];
     char str2[80];
-    while (1) {        
         // Abrir o arquivo FIFO em modo de leitura
         fd = open(myfifo, O_RDONLY);
         fd2 = open(myfifo2, O_RDONLY);
+    while (1) {        
         if(comecar == 0){
             time1 = (double) clock();
             time1 = time1 / CLOCKS_PER_SEC;
@@ -44,8 +44,6 @@ int main() {
         // Imprimir os dados lidos e fechar o arquivo
         printf("Data1: %s\n", str);
         printf("Data2: %s\n", str2);
-        close(fd);
-        close(fd2);
 
         esteira1 = atoi(str);
         esteira2 = atoi(str2);
@@ -62,6 +60,8 @@ int main() {
         printf("Total a cada 500: %d\n", peso);
         usleep(2000000);
     }
+        close(fd);
+        close(fd2);
 
     return 0;
 }
