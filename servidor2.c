@@ -6,10 +6,12 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <time.h>
+#include <sys/time.h>
  
-double time1, timedif;
 
 int main() {
+    struct timeval start, end;
+    double elapsed_time;
     int fd;
     int fd2;
     int esteira1;
@@ -31,16 +33,15 @@ int main() {
         fd = open(myfifo, O_RDONLY);
         fd2 = open(myfifo2, O_RDONLY);
     while (1) {        
-        if(comecar == 0){
-            time1 = (double) clock();
-            time1 = time1 / CLOCKS_PER_SEC;
-            comecar = 1;
-        }
         // Ler os dados do arquivo FIFO
         read(fd, str, 80);
         contador++;
         read(fd2, str2, 80);
         contador++;
+        if(comecar == 0){
+            gettimeofday(&start, NULL); // começa o tempo
+            comecar = 1;
+        }
         // Imprimir os dados lidos e fechar o arquivo
         printf("Data1: %s\n", str);
         printf("Data2: %s\n", str2);
@@ -52,8 +53,10 @@ int main() {
         if(contador >= 500){
             peso = peso_total;
             printf("Total a cada 500: %d\n", peso);
-            timedif = ( ((double) clock()) / CLOCKS_PER_SEC) - time1;
-            printf("The elapsed time is %f seconds\n", timedif);
+            gettimeofday(&end, NULL);
+            elapsed_time = (end.tv_sec - start.tv_sec) +
+                   (end.tv_usec - start.tv_usec) / 1e6;
+            printf("Tempo decorrido: %.6f segundos\n", elapsed_time);
             break; // somente para parar e vermos o tempo
             contador = 0;
         }

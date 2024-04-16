@@ -1,12 +1,15 @@
 #include <pthread.h>
 #include <stdio.h>
 #include <semaphore.h>
+#include <time.h>
+#include <sys/time.h>
 
 char linha[80]; // só para poder usar fgets e o programa pausa quando atinge 500 produtos
 int var_sensor = 0;
 int var_total = 0;
 int var_global = 0; // numero total de itens(vai até 500)
-double time1, timedif;
+struct timeval start, end;
+double elapsed_time;
 
 pthread_mutex_t exclusao_mutua = PTHREAD_MUTEX_INITIALIZER;
 sem_t mutex;
@@ -15,9 +18,12 @@ void verifica(){
     if(var_global >= 500){
         var_total = var_sensor;
         var_global = 0;
-        timedif = ( ((double) clock()) / CLOCKS_PER_SEC) - time1;
-        printf("The elapsed time is %f seconds\n", timedif);
-        fgets(linha, sizeof(linha), stdin);
+        gettimeofday(&end, NULL);
+            elapsed_time = (end.tv_sec - start.tv_sec) +
+                   (end.tv_usec - start.tv_usec) / 1e6;
+            printf("%d\n",var_total);
+            printf("Tempo decorrido: %.6f segundos\n", elapsed_time);
+        fgets(linha, sizeof(linha), stdin); // para parar o terminal
     }
 }
 
@@ -66,8 +72,7 @@ void main(){
    //criar thread 2
    pthread_create(&tid_2,&attr,thread_sensor_2,NULL);
 
-    time1 = (double) clock();
-    time1 = time1 / CLOCKS_PER_SEC;
+    gettimeofday(&start, NULL);
    //join thread
    pthread_join(tid_1, NULL);
    pthread_join(tid_2, NULL);
